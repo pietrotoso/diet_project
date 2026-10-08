@@ -4,3 +4,4 @@ This project works with data from the FAOSTAT food balances (1961-2013) to explo
 
 See Questions.md for the different questions.
 
+<p>leggere il file con latin-1</p>

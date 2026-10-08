@@ -1,4 +1,8 @@
+# File di RStudio / R
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# Dati grezzi
+data/raw/

@@ -9,4 +9,6 @@
 
 Eliminati i paesi che non hanno dati per tutti gli anni del database per motivi di semplicità
 
-Usati sia stimati sia dichiarati</p></h6>
+Usati sia stimati sia dichiarati
+
+Central Asia unica area che non ha tutti gli anni</p></h6>

@@ -11,4 +11,7 @@ Eliminati i paesi che non hanno dati per tutti gli anni del database per motivi 
 
 Usati sia stimati sia dichiarati
 
-Central Asia unica area che non ha tutti gli anni</p></h6>
+Central Asia unica area che non ha tutti gli anni</p>
+
+Per quelli solo kg, massimo è 0.26 (ci sono 19 coppie Area-Item)
+Per quelli solo cal, massimo 8.02, solo 8 sopra a 3 (68 coppie)</h6>

@@ -7,4 +7,6 @@
 <p>leggere il file con latin-1
 
 
-Eliminati i paesi che non hanno dati per tutti gli anni del database per motivi di semplicità</p></h6>
+Eliminati i paesi che non hanno dati per tutti gli anni del database per motivi di semplicità
+
+Usati sia stimati sia dichiarati</p></h6>

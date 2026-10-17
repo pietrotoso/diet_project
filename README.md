@@ -26,5 +26,7 @@ centroide vs relazione coppie
 
 tolti zeri dal giappone oats 2012/2013
 
+make it rectangular
+
 
 

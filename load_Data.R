@@ -45,7 +45,7 @@ Item_groups <- read_csv('data/item_groups.csv')
 
 Macro_groups <- Item_groups |> 
                         filter(!(`Item Group` %in% c('Grand Total','Vegetal Products','Animal Products'))) |> 
-                        select(`Item Code`,`Item Group`)
+                        select(`Item Code`,`Item Group`,`Item Group Code`)
 #keep only single items
 df_single_items <- df_calories_kilograms |> left_join(Macro_groups) |> filter(!is.na(`Item Group`))
 
@@ -67,6 +67,12 @@ tabella_centroidi <- df_question2 |> group_by(Year) |> select(Area,percentage_ye
 
 ##QUESTION 3
 
+#keep only macrogroups
+Macro_codes <- Item_groups |> 
+  filter(!(`Item Group` %in% c('Grand Total','Vegetal Products','Animal Products'))) |> 
+  distinct(`Item Group Code`)
+#keep only single itemsdistinct(`Item Group Code`)
+df_question3 <- df_calories_kilograms |> filter(`Item Code` %in% pull(Macro_codes,`Item Group Code`))
 
 
 #filtrato <- all_data |> filter(Area %in% c('Italy','Belize','Kenya','Philippines')) |> 

@@ -5,7 +5,7 @@ all_data <- read_csv(file = 'data/raw/FoodBalanceSheetsHistoric_E_All_Data_(Norm
 
 ## PER DOMANDE 1,2,3
 
-#keep only single countries with relative country groups
+#keep only single countries
 Area_codes <- read_csv(file = 'data/raw/FoodBalanceSheetsHistoric_E_All_Data_(Normalized)/country_with_groups.csv')
 Single_countries <- Area_codes |> distinct(Country, `Country Code`) |> pull(`Country Code`)
 df_only_single_countries <- all_data |> filter(`Area Code`%in% Single_countries)
@@ -18,22 +18,26 @@ continents <- c("Africa","Europe","Americas","Asia","Oceania")
 df_continents <- Area_codes |> filter(`Country Group` %in% continents) |> rename(`Area Code`=`Country Code`,Continent=`Country Group`,Continent_code=`Country Group Code`) |> select(Continent,Continent_code, `Area Code`)
 df_areas <- Area_codes |> filter(!(`Country Group` %in% continents) & `Country Group Code`<5700 & `Country Group Code` != 5000) |> rename(`Area Code`=`Country Code`, Macroarea=`Country Group`,Macroarea_code=`Country Group Code`) |> select(Macroarea,Macroarea_code,`Area Code`)
 with_cont <- left_join(df_only_single_countries,df_continents)
-rm(df_only_single_countries)
+rm(df_only_single_countries, df_continents)
 gc()
 with_macro <- left_join(with_cont,df_areas)
+rm(with_cont,df_areas)
+gc()
 
-#select countries to remove
+
+#select countries that don't havee all of the years to remove
 Countries_to_remove <- with_macro |> distinct(`Area Code`,Year) |> count(`Area Code`) |> filter(n!=53) |> pull(`Area Code`)
 
 #keep only countries with data for all the years
 df_fullyears_countries <- with_macro |> filter(!(`Area Code` %in% Countries_to_remove))
 
-
-# QUESTION 1
 # keep only food supply in calories and kilograms
 df_calories_kilograms <- df_fullyears_countries |> filter(`Element Code` %in% c(664,645))
-#togli gli zeri del giappone
+#remove anomalous negatives (Japan oats)
 df_calories_kilograms$Value <- pmax(df_calories_kilograms$Value,rep(0,length(df_calories_kilograms$Value)))
+
+
+# QUESTION 1
 
 #Load item groups
 Item_groups <- read_csv('data/item_groups.csv')
@@ -68,14 +72,15 @@ distances <- df_question2 |> group_by(Year) |> group_modify(~{
 }) |> ungroup()
 
 #adding normalized median/average column to compare curves
-distances <- distances |> group_by(method) |> mutate(median_scaled=median/median[1],average_scaled=average/average[1]) 
+distances <- distances |> group_by(method) |> mutate(median_scaled=median/median[1],average_scaled=average/average[1], mean_pairwise_scaled= mean_pairwise_distance/mean_pairwise_distance[1]) 
 #calculate distance growth rate per year
 with_rates <- distances|>  mutate(rate_median = (median - lag(median))/lag(median),rate_average = (average - lag(average))/lag(average))
 #calculate moving average of median/average and their rates
 with_moving_avg <- with_rates |> mutate(moving_median=slide_dbl(median,mean,.before=4,.complete=TRUE),moving_average=slide_dbl(average,mean,.before=4,.complete=TRUE),moving_rate_median=slide_dbl(rate_median,mean,.before=4,.complete=TRUE), moving_rate_average=slide_dbl(rate_average,mean,.before=4,.complete=TRUE))
 
-
-#ggplot(conf,aes(year,median,color=dist_type)) + geom_line()+geom_ribbon(aes(ymin=`40_quantile`,ymax = `60_quantile`,fill=dist_type),linetype='dashed',linewidth = 0.25, alpha=0.05) +labs(y='average_distanve')
+#calcola centroide anno per anno
+tabella_centroidi <- df_question2 |> group_by(Year) |> select(Area,percentage_year,`Item Code`) |> pivot_wider(names_from = `Item Code`,values_from = percentage_year) |> group_modify(~centroid_table(.x) |> as.list() |> tibble::as_tibble())
+#ggplot(conf,aes(year,median,color=dist_type)) + geom_line()+geom_ribbon(aes(yminè=`40_quantile`,ymax = `60_quantile`,fill=dist_type),linetype='dashed',linewidth = 0.25, alpha=0.05) +labs(y='average_distanve')
 #con_quote |> filter(`Area Code` %in% c(2,41,68,55,100,121)) |> ggplot(aes(Year,percentage_year,color=Area)) + geom_line() + facet_wrap(~Item,scales='free_y') + scale_color_brewer(palette = "Set1")
 
 ##QUESTION 3

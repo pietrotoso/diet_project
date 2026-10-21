@@ -28,5 +28,5 @@ tolti zeri dal giappone oats 2012/2013
 
 make it rectangular
 
-what to do with macrogroups where some countries have no values at all?
+filtered out lines of country-year that had sum 0 when ivìnvestigating specific macrogroups of items
 

@@ -5,16 +5,25 @@ library(slider)
 #element_code: 645 for kg/capita/year, 664 for kcal/capita/day
 #dist_method: "bray-curtis", "euclidean", "hellinger" or "all"
 #pairwise: TRUE to include pairwise distance calculation, FALSE otherwise
-full_process <- function(df,item_group,element_code,dist_method,pairwise){
-  df <- prepare_df_question2(df,item_group,element_code)
+#Area: name of the area to study, if you want the whole world then "world"
+full_process <- function(df,item_group,element_code,dist_method,pairwise,area){
+  df <- prepare_df_questions_23(df,item_group,element_code,area)
   df <- statistics_final(df,dist_method,pairwise)
   return(df)
 }
 
 
-prepare_df_question2 <- function(df,item_group,element_code){
+prepare_df_questions_23 <- function(df,item_group,element_code,area){
+  if (area!="world"){
+    df <- df |> filter(Continent==area |Macroarea==area)}
   if (item_group!= "all") {group_element_df <- df |> filter(`Item Group`==item_group, `Element Code`==element_code)}
   else {group_element_df <- df |> filter(`Element Code`==element_code)}
+  #print couples Area, Year that will be excluded since they have no values for the group
+  excluded <- group_element_df |> group_by(Area,Year) |> summarise(somma=sum(Value)) |> filter(near(somma,0)) |> distinct(Area,Year)
+  print(excluded)
+  #filter them out
+  group_element_df <- anti_join(group_element_df,excluded)
+  #calculate percentages of diet composition
   with_percentages <- group_element_df |> group_by(`Area Code`,Area,Year) |> mutate(Year_tot_value=sum(Value),.before=Flag) |> ungroup() |> mutate(percentage_year=Value/Year_tot_value, .before=Flag)
   
   return(with_percentages)
